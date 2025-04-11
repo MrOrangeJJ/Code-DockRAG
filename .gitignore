@@ -11,3 +11,5 @@ uploads/
 build_and_run_local.sh
 build.sh
 Dockerfile.super-slim
+pack_docker.sh
+.DS_Store
