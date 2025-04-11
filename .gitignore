@@ -1,0 +1,13 @@
+.env
+.cursorignore
+.specstory/
+venv/
+__pycache__/
+codebases/
+docs/
+logs/
+packs/
+uploads/
+build_and_run_local.sh
+build.sh
+Dockerfile.super-slim

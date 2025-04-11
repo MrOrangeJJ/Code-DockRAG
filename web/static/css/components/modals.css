@@ -1,0 +1,396 @@
+/* modals.css - 模态框相关样式 */
+
+/* 模态框基础样式 */
+.modal {
+    display: none; /* 初始状态隐藏，由JS控制显示 */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); /* 半透明背景 */
+    backdrop-filter: blur(5px); /* 背景模糊效果 */
+    z-index: 1000;
+    padding: 0; 
+    opacity: 0;
+    transition: opacity var(--transition) ease;
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+}
+
+.modal.open {
+    display: flex; /* 显示时使用flex布局实现居中 */
+    opacity: 1;
+}
+
+/* 所有模态框的通用内容样式 */
+.modal-content {
+    background-color: var(--color-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    width: 70%; /* 改为占屏幕宽度的70% */
+    height: 95vh; /* 占视口高度的95% */
+    max-height: 95vh; /* 最大高度限制 */
+    display: flex;
+    flex-direction: column;
+    transform: scale(0.95);
+    transition: transform var(--transition) ease;
+    border: 1px solid var(--color-gray-400);
+    overflow: hidden; /* 防止内容溢出 */
+    margin: 0 auto; /* 水平居中 */
+}
+
+/* 模态框打开时的动画效果 */
+.modal.open .modal-content {
+    animation: scaleIn 0.3s forwards;
+}
+
+/* 模态框头部 */
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--color-gray-400);
+    background-color: var(--color-gray-300);
+    position: sticky; /* 头部固定 */
+    top: 0;
+    z-index: 10;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-dark);
+}
+
+/* 模态框内容区域 */
+.modal-body {
+    padding: 1.5rem;
+    overflow-y: auto; /* 内容过多时可滚动 */
+    flex: 1; /* 占用剩余空间 */
+}
+
+/* 模态框尺寸 */
+.modal-lg {
+    max-width: 900px;
+    width: 90%;
+    max-height: 80vh;
+}
+
+/* 搜索表单容器样式 - 统一适用于普通和强效搜索 */
+.search-form-container {
+    max-width: 900px; 
+    margin: 0 auto 1.5rem auto; 
+    width: 95%;
+}
+
+/* 搜索按钮容器样式 - 统一适用于普通和强效搜索 */
+.search-button-container {
+    display: flex; 
+    justify-content: center; 
+    margin: 1.5rem 0;
+}
+
+.search-button-group {
+    display: inline-flex; 
+    background-color: #f3f4f6; 
+    padding: 0.5rem; 
+    border-radius: 0.75rem; 
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    min-width: 360px;
+    justify-content: center; /* 确保按钮在容器内居中 */
+}
+
+.search-button {
+    min-width: 160px; 
+    border-radius: 0.5rem; 
+    margin: 0 0.25rem; 
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1); 
+    font-weight: 500; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    gap: 0.5rem; 
+    height: 48px; 
+    font-size: 1rem;
+}
+
+/* 文件内容查看样式 */
+.file-content-view {
+    padding: 1rem;
+    background-color: var(--color-gray-200);
+    border-radius: var(--radius);
+}
+
+.file-content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--color-gray-400);
+}
+
+.file-content-pre {
+    background-color: var(--color-white);
+    padding: 1rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-gray-400);
+    overflow: auto;
+    margin: 0;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 0.9rem;
+}
+
+.file-content pre {
+    overflow-y: auto;
+}
+
+/* Log levels - 强效搜索日志 */
+.log-entry {
+    margin-bottom: 5px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    line-height: 1.4;
+}
+
+.log-info {
+    background-color: #e0e0e0;
+    color: #333;
+}
+
+.log-error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.log-warning {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.log-success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.log-debug {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+
+.log-trace {
+    background-color: #f0f0f0; 
+    color: #555; 
+    font-style: italic;
+}
+
+/* 进度条 */
+.progress-container {
+    width: 100%;
+    height: 24px;
+    background-color: var(--color-gray-300);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-info) 100%);
+    border-radius: 12px;
+    transition: width 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: var(--font-weight-medium);
+    font-size: 0.85rem;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    position: relative;
+    z-index: 1;
+    min-width: 40px; /* 确保即使进度很小也能看到百分比 */
+}
+
+.progress-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        90deg, 
+        rgba(255, 255, 255, 0.15) 0%, 
+        rgba(255, 255, 255, 0.05) 100%
+    );
+    animation: progress-shine 1.5s ease-in-out infinite;
+    z-index: -1;
+}
+
+/* 标签页 */
+.tabs {
+    display: flex;
+    border-bottom: 1px solid var(--color-gray-400);
+    margin: 1rem 0;
+    background-color: var(--color-gray-200);
+    border-radius: var(--radius) var(--radius) 0 0;
+}
+
+.tab-button {
+    padding: 0.75rem 1.25rem;
+    cursor: pointer;
+    border: none;
+    background-color: transparent;
+    border-bottom: 3px solid transparent;
+    color: var(--color-gray-700);
+    font-weight: var(--font-weight-medium);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.tab-button:hover {
+    background-color: var(--color-gray-300);
+    color: var(--color-dark);
+}
+
+.tab-button.active {
+    border-bottom-color: var(--color-primary);
+    color: var(--color-primary);
+    background-color: var(--color-white);
+}
+
+.tab-button i {
+    font-size: 1rem;
+}
+
+.tab-content {
+    display: none;
+    padding: 1rem;
+    background-color: var(--color-white);
+    border: 1px solid var(--color-gray-400);
+    border-top: none;
+    border-radius: 0 0 var(--radius) var(--radius);
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* 搜索状态指示器 */
+.search-time-display {
+    margin-top: 1rem;
+    padding: 0.5rem;
+    background-color: var(--color-gray-200);
+    border-radius: var(--radius);
+    text-align: right;
+    font-size: 0.85rem;
+    color: var(--color-gray-700);
+}
+
+/* 自定义折叠区域样式 */
+.collapsible-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    background-color: #f9fafb;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.collapsible-header:hover {
+    background-color: #f3f4f6;
+    border-color: #d1d5db;
+}
+
+.collapsible-content {
+    margin-top: 0.5rem;
+    display: none;
+    transition: all 0.3s ease;
+}
+
+/* 工具调用卡片样式 */
+.tool-call-card {
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    background-color: #f8f9fa;
+    padding: 12px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.tool-call-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.tool-call-name {
+    font-weight: 600;
+    color: #1a202c;
+    margin-left: 10px;
+}
+
+/* 搜索结果容器 */
+.search-results-container {
+    overflow-y: auto; 
+    padding: 1rem 0; 
+    border-radius: 0.5rem; 
+    background-color: var(--color-gray-100); 
+    width: 100%;
+}
+
+/* 强效搜索标签面板 */
+.strong-search-tab-panel {
+    display: none;
+    padding: 1rem; 
+    background-color: white; 
+    border-radius: 0.75rem; 
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.strong-search-tab-panel.active {
+    display: block;
+}
+
+/* 强效搜索日志容器 */
+.log-container {
+    border-radius: 0.5rem; 
+    box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06); 
+    overflow-y: auto; 
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; 
+    line-height: 1.5;
+    border: 1px solid var(--color-gray-400);
+    padding: 1.25rem;
+    background-color: var(--color-gray-200);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+/* 响应式调整 */
+@media (max-width: 980px) {
+    .modal-content {
+        width: 95%;
+        height: 98vh;
+        max-height: 98vh;
+    }
+    
+    .tab-button {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.9rem;
+    }
+    
+    .modal-body {
+        padding: 1rem;
+    }
+} 

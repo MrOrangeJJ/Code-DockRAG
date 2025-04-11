@@ -1,0 +1,215 @@
+/* explorer.css - 文件浏览器和AST查看器样式 */
+
+/* 文件浏览器工具栏 */
+.explorer-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    background-color: var(--color-gray-300);
+    border-radius: var(--radius);
+}
+
+.breadcrumb-container {
+    flex: 1;
+    overflow-x: auto;
+}
+
+.breadcrumb {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-wrap: nowrap;
+}
+
+.breadcrumb-item {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.breadcrumb-item:not(:last-child)::after {
+    content: '/';
+    margin: 0 0.5rem;
+    color: var(--color-gray-600);
+}
+
+.breadcrumb-item a {
+    color: var(--color-gray-700);
+    text-decoration: none;
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast) ease;
+}
+
+.breadcrumb-item a:hover {
+    background-color: var(--color-gray-400);
+    color: var(--color-dark);
+}
+
+.breadcrumb-item.active a {
+    color: var(--color-primary);
+    font-weight: var(--font-weight-medium);
+}
+
+.explorer-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* AST树视图样式 */
+.ast-tree-container {
+    background-color: var(--color-white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-top: 1rem;
+    overflow: auto;
+    max-height: 70vh;
+}
+
+.ast-tree {
+    padding: 1rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.ast-node {
+    margin-left: 20px;
+    position: relative;
+}
+
+.ast-node-header {
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    transition: background-color var(--transition-fast) ease;
+}
+
+.ast-node-header:hover {
+    background-color: var(--color-gray-300);
+}
+
+.ast-node-header::before {
+    content: '';
+    position: absolute;
+    left: -15px;
+    top: 0;
+    height: 100%;
+    width: 10px;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3e%3cpath d='M2,2 L8,2 L5,8 Z' fill='%239ca3af'/%3e%3c/svg%3e");
+    background-position: center center;
+    background-repeat: no-repeat;
+    transition: transform var(--transition-fast) ease;
+}
+
+.ast-node.collapsed > .ast-node-header::before {
+    transform: rotate(-90deg);
+}
+
+.ast-node.collapsed > .ast-node-content {
+    display: none;
+}
+
+.ast-node-name {
+    font-weight: var(--font-weight-medium);
+}
+
+.ast-node-type {
+    color: var(--color-primary);
+    margin-right: 8px;
+}
+
+.ast-node-line {
+    color: var(--color-gray-600);
+    font-size: 0.85rem;
+    margin-left: 8px;
+}
+
+.ast-node-leaf {
+    color: var(--color-gray-700);
+    margin-left: 20px;
+    padding: 2px 8px;
+}
+
+.ast-file-header {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background-color: var(--color-gray-300);
+    border-bottom: 1px solid var(--color-gray-400);
+    position: sticky;
+    top: 0;
+    z-index: 5;
+}
+
+.ast-file-name {
+    font-weight: var(--font-weight-medium);
+    flex: 1;
+}
+
+.ast-language-tag {
+    background-color: var(--color-info-light);
+    color: var(--color-info);
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-full);
+    font-size: 0.85rem;
+    font-weight: var(--font-weight-medium);
+}
+
+.ast-file-item {
+    border-bottom: 1px solid var(--color-gray-400);
+    position: relative;
+}
+
+.ast-file-item:last-child {
+    border-bottom: none;
+}
+
+.ast-summary {
+    padding: 1rem;
+    background-color: var(--color-gray-200);
+    border-bottom: 1px solid var(--color-gray-400);
+}
+
+.ast-summary-title {
+    font-size: 1.1rem;
+    font-weight: var(--font-weight-medium);
+    margin-bottom: 0.75rem;
+}
+
+.ast-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.ast-stat-item {
+    background-color: var(--color-white);
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-sm);
+    min-width: 120px;
+}
+
+.ast-stat-title {
+    font-size: 0.85rem;
+    color: var(--color-gray-600);
+    margin-bottom: 0.25rem;
+}
+
+.ast-stat-value {
+    font-size: 1.25rem;
+    font-weight: var(--font-weight-medium);
+    color: var(--color-primary);
+}
+
+.file-explorer-list-container {
+    overflow-y: auto;
+    margin-top: 1rem;
+} 

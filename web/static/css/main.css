@@ -1,0 +1,46 @@
+/**
+ * Code Dock 主样式文件
+ * 组织化的CSS结构，按功能模块化管理
+ */
+
+/* 导入基础变量 */
+@import url('components/variables.css');
+
+/* 导入基础样式 */
+@import url('components/base.css');
+
+/* 导入布局样式 */
+@import url('components/layout.css');
+
+/* 导入表单样式 */
+@import url('components/forms.css');
+
+/* 导入按钮样式 */
+@import url('components/buttons.css');
+
+/* 导入卡片和列表样式 */
+@import url('components/cards.css');
+
+/* 导入模态框样式 */
+@import url('components/modals.css');
+
+/* 导入文件浏览器和AST查看器样式 */
+@import url('components/explorer.css');
+
+/* 响应式样式 */
+@media (max-width: 768px) {
+    .search-form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .search-form .form-group {
+        margin-right: 0;
+        margin-bottom: 15px;
+    }
+
+    .search-button-group {
+        min-width: auto;
+        width: 100%;
+    }
+} 

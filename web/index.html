@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Dock - 代码库管理面板</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/main.css">
+    <!-- 添加Marked.js用于Markdown渲染 -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <!-- 引入模块化JS文件 -->
+    <script src="/static/js/utils.js"></script>
+    <script src="/static/js/ui-helpers.js"></script>
+    <script src="/static/js/codebase-manager.js"></script>
+    <script src="/static/js/file-explorer.js"></script>
+    <script src="/static/js/search.js"></script>
+    <script src="/static/js/strong-search.js"></script>
+    <script src="/static/js/ast-viewer.js"></script>
+    <script src="/static/js/main.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <div class="logo">
+                <i class="fas fa-code-branch"></i>
+                <h1>Code Dock 代码库管理</h1>
+            </div>
+            
+            <nav class="app-nav">
+                <a href="/" class="nav-link active">
+                    <i class="fas fa-database"></i>
+                    管理代码库
+                </a>
+            </nav>
+        </header>
+    
+        <main class="main-content">
+            <section class="section">
+                <div class="section-header">
+                    <i class="fas fa-database"></i>
+                    <h2>管理代码库</h2>
+                    <div class="section-actions">
+                        <button id="refresh-codebases" class="btn btn-outline btn-icon">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="codebases-loading" class="loading-container">
+                    <div class="loader"></div>
+                    <p>加载代码库列表...</p>
+                </div>
+                
+                <div id="manage-status" class="status-message"></div>
+                
+                <div id="codebases-grid" class="codebases-grid">
+                    <!-- 代码库将通过 JavaScript 动态生成 -->
+                </div>
+        
+                <div id="no-codebases" class="empty-state hidden">
+                    <i class="fas fa-database"></i>
+                    <h3>暂无代码库</h3>
+                    <p>您尚未上传任何代码库。请使用下方表单上传您的第一个代码库。</p>
+                    <button id="upload-first-codebase" class="btn btn-primary">
+                        <i class="fas fa-upload"></i>
+                        上传代码库
+                    </button>
+                </div>
+            </section>
+        
+            <section class="section upload-section">
+                <div class="section-header">
+                    <i class="fas fa-upload"></i>
+                    <h2>上传新代码库</h2>
+                </div>
+                
+                <form id="upload-form" class="upload-form">
+                    <div class="form-group">
+                        <label for="codebase-name">代码库名称</label>
+                        <input type="text" id="codebase-name" name="name" placeholder="输入代码库名称" required>
+                    </div>
+                    
+                    <div class="form-group file-upload-group">
+                        <label>代码库文件 (ZIP)</label>
+                        <div class="file-upload-wrapper">
+                            <input type="file" id="codebase-file" name="file" accept=".zip" required>
+                            <div class="file-upload-placeholder">
+                                <i class="fas fa-file-archive"></i>
+                                <p>点击上传或拖放ZIP文件</p>
+                                <span>支持 .zip 格式</span>
+                            </div>
+                            <div class="file-upload-preview">
+                                <i class="fas fa-file-archive"></i>
+                                <span id="file-name-display">未选择文件</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="upload-status" class="status-message"></div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-upload"></i>
+                        上传
+                    </button>
+                </form>
+            </section>
+        </main>
+        
+        <footer class="app-footer">
+            <div class="api-info">
+                <i class="fas fa-server"></i>
+                API 地址: <span id="api-url">正在加载...</span>
+            </div>
+            <div class="app-version">Code Dock 版本 1.0</div>
+        </footer>
+    </div>
+    
+    <!-- 文件浏览器模态框 -->
+    <div id="file-explorer-modal" class="modal">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h3>文件浏览器 - <span id="explorer-codebase-name"></span></h3>
+                <button id="explorer-close" class="btn-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="explorer-toolbar">
+                    <div class="breadcrumb-container">
+                        <ol id="file-breadcrumb" class="breadcrumb">
+                            <li class="breadcrumb-item active"><a href="#" data-path="">根目录</a></li>
+                        </ol>
+                    </div>
+                    <div class="explorer-actions">
+                        <button id="upload-file-btn" class="btn btn-primary btn-sm">
+                            <i class="fas fa-upload"></i>
+                            上传文件
+                        </button>
+                        <button id="create-folder-btn" class="btn btn-outline btn-sm">
+                            <i class="fas fa-folder-plus"></i>
+                            新建文件夹
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="explorer-status" class="status-message"></div>
+                
+                <div id="file-explorer-loading" class="loading-container">
+                    <div class="loader"></div>
+                    <p>加载文件列表...</p>
+                </div>
+                
+                <div id="file-list" class="file-list">
+                    <!-- 文件列表将通过 JavaScript 动态生成 -->
+                </div>
+                
+                <div id="file-content-view" class="file-content-view hidden">
+                    <div class="file-content-header">
+                        <h4 id="content-file-name">文件名</h4>
+                        <button id="back-to-list" class="btn btn-outline btn-sm">
+                            <i class="fas fa-arrow-left"></i>
+                            返回列表
+                        </button>
+                    </div>
+                    <pre id="file-content" class="file-content-pre"></pre>
+                </div>
+                
+                <form id="file-upload-form" class="file-upload-form hidden">
+                    <div class="form-group">
+                        <label>上传到当前目录</label>
+                        <div class="file-upload-wrapper">
+                            <input type="file" id="explorer-file-input" name="file" required>
+                            <div class="file-upload-placeholder">
+                                <i class="fas fa-file-upload"></i>
+                                <p>点击上传或拖放文件</p>
+                            </div>
+                            <div class="file-upload-preview">
+                                <i class="fas fa-file"></i>
+                                <span id="explorer-file-name">未选择文件</span>
+                            </div>
+                        </div>
+                        <input type="hidden" id="upload-directory" name="directory" value="">
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-upload"></i>
+                            上传
+                        </button>
+                        <button type="button" id="cancel-upload" class="btn btn-outline">
+                            <i class="fas fa-times"></i>
+                            取消
+                        </button>
+                    </div>
+                </form>
+                
+                <form id="folder-create-form" class="folder-create-form hidden">
+                    <div class="form-group">
+                        <label for="folder-name">文件夹名称</label>
+                        <input type="text" id="folder-name" placeholder="输入文件夹名称" required>
+                        <input type="hidden" id="create-directory" value="">
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-folder-plus"></i>
+                            创建
+                        </button>
+                        <button type="button" id="cancel-folder" class="btn btn-outline">
+                            <i class="fas fa-times"></i>
+                            取消
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- AST树视图模态框 -->
+    <div id="ast-view-modal" class="modal">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h3>AST树结构 - <span id="ast-codebase-name"></span></h3>
+                <button id="ast-modal-close" class="btn-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="ast-loading" class="loading-container">
+                    <div class="loader"></div>
+                    <p>加载AST树结构...</p>
+                </div>
+                
+                <div id="ast-error" class="status-message hidden">
+                    <p class="status-error">加载AST树结构时出错</p>
+                </div>
+                
+                <div id="ast-content" class="hidden">
+                    <div id="ast-summary" class="ast-summary">
+                        <h4 class="ast-summary-title">代码库统计</h4>
+                        <div class="ast-stats">
+                            <div class="ast-stat-item">
+                                <div class="ast-stat-title">总文件数</div>
+                                <div id="ast-stat-files" class="ast-stat-value">0</div>
+                            </div>
+                            <div id="ast-languages-container" class="ast-stat-item">
+                                <div class="ast-stat-title">语言分布</div>
+                                <div id="ast-stat-languages" class="ast-stat-value"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="ast-tree-container" class="ast-tree-container">
+                        <!-- 文件列表和AST树将通过JavaScript动态生成 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 新增: 常规搜索模态框 -->
+    <div id="search-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>常规搜索 - <span id="search-modal-codebase-name"></span></h3>
+                <button id="search-modal-close" class="btn-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="search-modal-form" class="search-form-container">
+                    <div class="form-group">
+                        <label for="search-modal-query">查询内容</label>
+                        <textarea id="search-modal-query" rows="3" placeholder="输入搜索查询内容" required></textarea>
+                    </div>
+                    <div class="form-group form-check" style="text-align: center; margin-bottom: 1rem;">
+                        <input type="checkbox" id="search-modal-rerank">
+                        <label for="search-modal-rerank">重排序结果 (更慢)</label>
+                    </div>
+                    <div class="search-button-container">
+                        <div class="search-button-group">
+                            <button type="submit" class="btn btn-primary search-button">
+                                <i class="fas fa-search"></i> 搜索
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                <div id="search-modal-loading" class="loading-container hidden">
+                    <div class="loader"></div>
+                    <p>正在搜索...</p>
+                </div>
+                <div id="search-modal-results" class="search-results-container">
+                    <!-- 搜索结果将显示在这里 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新增: 强效搜索模态框 -->
+    <div id="strong-search-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-brain"></i> 强效搜索 - <span id="strong-search-modal-codebase-name"></span></h3>
+                <button id="strong-search-modal-close" class="btn-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="strong-search-connection-status" class="status-badge status-disconnected" style="margin-bottom: 1rem; text-align: center;">
+                    <i class="fas fa-plug"></i> 未连接
+                </div>
+                <form id="strong-search-modal-form" class="search-form-container">
+                    <div class="form-group">
+                        <label for="strong-search-modal-query">查询内容</label>
+                        <textarea id="strong-search-modal-query" rows="4" placeholder="输入详细查询内容，例如：'如何实现用户认证流程？'" required></textarea>
+                    </div>
+                    
+                    <!-- 现代化的按钮容器 -->
+                    <div class="search-button-container">
+                        <div class="search-button-group">
+                            <button type="submit" id="strong-search-modal-submit" class="btn btn-primary search-button">
+                                <i class="fas fa-search"></i> 开始搜索
+                            </button>
+                            <button type="button" id="strong-search-modal-stop" class="btn btn-danger search-button" disabled>
+                                <i class="fas fa-stop"></i> 停止搜索
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <div id="strong-search-modal-results-area" class="hidden">
+                    <!-- 进度条改为现代风格 -->
+                    <div style="display: flex; justify-content: center; margin: 1.5rem 0;">
+                        <div class="progress-container" style="width: 80%; max-width: 600px;">
+                            <div id="strong-search-modal-progress-bar" class="progress-bar">0%</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 强效搜索标签页 -->
+                    <div style="display: flex; justify-content: center; margin: 1.5rem 0;">
+                        <div class="tabs" style="width: auto; display: inline-flex; min-width: 400px; justify-content: center;">
+                            <button class="tab-button active" data-tab="strong-search-logs">
+                                <i class="fas fa-terminal"></i> 实时日志
+                            </button>
+                            <button class="tab-button" data-tab="strong-search-final-result">
+                                <i class="fas fa-check-circle"></i> 最终结果
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 日志标签内容 -->
+                    <div id="tab-strong-search-logs" class="strong-search-tab-panel active">
+                        <!-- 居中显示日志容器 -->
+                        <div style="display: flex; justify-content: center;">
+                            <div style="width: 95%;">
+                                <h4 style="text-align: center; margin-bottom: 1rem; color: #4f46e5;">
+                                    <i class="fas fa-terminal"></i> 实时执行日志
+                                </h4>
+                                <div id="strong-search-modal-log-container" class="log-container">
+                                    <div class="log-entry log-info" style="text-align: center; padding: 0.5rem; border-bottom: 1px dashed #e5e7eb; color: #6b7280; font-style: italic;">
+                                        <i class="fas fa-info-circle"></i> 开始新的搜索将在此显示日志
+                                    </div>
+                                </div>
+                                <div style="margin-top: 0.75rem; text-align: center; font-size: 0.85rem; color: #6b7280; font-style: italic;">
+                                    <i class="fas fa-info-circle"></i> 最新日志显示在底部，页面将自动滚动
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 结果标签内容 -->
+                    <div id="tab-strong-search-final-result" class="strong-search-tab-panel">
+                        <!-- 居中显示结果容器 -->
+                        <div style="display: flex; justify-content: center;">
+                            <div id="strong-search-modal-result-container" style="width: 95%;">
+                                <!-- 结果内容将在JS中动态生成 -->
+                                <div id="strong-search-modal-result-answer" style="display:none;"></div>
+                                <div id="strong-search-modal-relevant-files" style="display:none;"></div>
+                                <div id="strong-search-modal-time" style="display:none;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

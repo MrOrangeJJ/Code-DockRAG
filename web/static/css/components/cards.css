@@ -1,0 +1,341 @@
+/* cards.css - 卡片和列表样式 */
+
+/* 代码库卡片网格 */
+.codebases-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+    padding: 1.5rem;
+}
+
+.codebase-card {
+    position: relative;
+    background-color: var(--color-white);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: all var(--transition) ease;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--color-gray-300);
+    animation: fadeIn 0.5s ease-out;
+    animation-fill-mode: both;
+}
+
+.codebase-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-4px);
+}
+
+.codebase-card-header {
+    padding: 1.25rem;
+    border-bottom: 1px solid var(--color-gray-400);
+    background-color: var(--color-gray-300);
+    position: relative;
+    overflow: hidden;
+}
+
+.codebase-card-header:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--color-primary-gradient);
+}
+
+.codebase-name {
+    font-size: 1.25rem;
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: 0.75rem;
+    color: var(--color-dark);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.codebase-name i {
+    color: var(--color-primary);
+    background: var(--color-primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.codebase-status {
+    margin-bottom: 0.5rem;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: var(--radius-full);
+    font-size: 0.85rem;
+    font-weight: var(--font-weight-medium);
+    box-shadow: var(--shadow-sm);
+}
+
+.status-badge.indexed {
+    background-color: var(--color-success-light);
+    color: var(--color-success);
+}
+
+.status-badge.pending {
+    background-color: var(--color-warning-light);
+    color: var(--color-warning);
+}
+
+.status-badge.indexing {
+    background-color: var(--color-primary-light);
+    color: var(--color-primary);
+    animation: pulse 1.5s infinite;
+}
+
+/* LSP状态徽章样式 */
+.lsp-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: var(--radius-full);
+    font-size: 0.85rem;
+    font-weight: var(--font-weight-medium);
+    box-shadow: var(--shadow-sm);
+    margin-left: 0.5rem;
+}
+
+.lsp-status-badge.ready {
+    background-color: var(--color-success-light);
+    color: var(--color-success);
+}
+
+.lsp-status-badge.not-ready {
+    background-color: var(--color-danger-light);
+    color: var(--color-danger);
+}
+
+.lsp-status-badge.preparing {
+    background-color: var(--color-info-light);
+    color: var(--color-info);
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.7; }
+    50% { opacity: 1; }
+    100% { opacity: 0.7; }
+}
+
+.indexing-spinner {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border: 2px solid rgba(0,0,0,0.1);
+    border-radius: 50%;
+    border-top-color: currentColor;
+    animation: spin 1s linear infinite;
+    margin-right: 4px;
+}
+
+.codebase-card.non-indexed .codebase-actions button:not(.index-btn):not(.browse-btn):not(.delete-btn) {
+    display: none;
+}
+
+.status-badge.status-disconnected {
+    background-color: var(--color-danger-light);
+    color: var(--color-danger);
+}
+
+.status-badge.status-connecting {
+    background-color: var(--color-warning-light);
+    color: var(--color-warning);
+}
+
+.status-badge.status-connected {
+    background-color: var(--color-success-light);
+    color: var(--color-success);
+}
+
+.codebase-card-body {
+    padding: 1.25rem;
+}
+
+.codebase-info {
+    margin-bottom: 1.25rem;
+}
+
+.codebase-info-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+    color: var(--color-gray-700);
+    padding: 0.5rem;
+    border-radius: var(--radius);
+    transition: background-color var(--transition-fast) ease;
+}
+
+.codebase-info-item:hover {
+    background-color: var(--color-gray-300);
+}
+
+.codebase-info-item i {
+    color: var(--color-primary);
+    width: 20px;
+    text-align: center;
+}
+
+.codebase-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+/* 文件列表相关 */
+.file-list {
+    border: 1px solid var(--color-gray-400);
+    border-radius: var(--radius);
+    overflow: hidden;
+}
+
+.file-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--color-gray-400);
+    cursor: pointer;
+    transition: background-color var(--transition-fast) ease;
+}
+
+.file-item:last-child {
+    border-bottom: none;
+}
+
+.file-item:hover {
+    background-color: var(--color-gray-300);
+}
+
+.file-item-icon {
+    font-size: 1.25rem;
+    width: 2rem;
+    text-align: center;
+    color: var(--color-gray-700);
+}
+
+.file-item-icon.folder {
+    color: var(--color-warning);
+}
+
+.file-item-icon.file {
+    color: var(--color-info);
+}
+
+.file-item-name {
+    flex: 1;
+    margin-left: 0.5rem;
+}
+
+.file-item-meta {
+    color: var(--color-gray-600);
+    font-size: 0.85rem;
+}
+
+.file-item-actions {
+    display: flex;
+    gap: 0.5rem;
+    opacity: 0;
+    transition: opacity var(--transition-fast) ease;
+}
+
+.file-item:hover .file-item-actions {
+    opacity: 1;
+}
+
+.file-action {
+    background: none;
+    border: none;
+    padding: 0.35rem;
+    color: var(--color-gray-700);
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: all var(--transition-fast) ease;
+}
+
+.file-action:hover {
+    background-color: var(--color-gray-400);
+    color: var(--color-primary);
+}
+
+.file-action.delete:hover {
+    color: var(--color-danger);
+}
+
+/* 搜索结果卡片样式 */
+.search-result-item {
+    margin-bottom: 1.5rem;
+    padding: 1rem 1.5rem;
+    background-color: #f9fafb;
+    border-radius: 0.5rem;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* 加载指示器 */
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    gap: 1rem;
+}
+
+.loader {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--color-gray-300);
+    border-radius: 50%;
+    border-top: 3px solid var(--color-primary);
+    animation: spin 1s linear infinite;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* 状态消息 */
+.status-message {
+    padding: 0 1.5rem 1.5rem;
+}
+
+.status-message p {
+    padding: 1rem;
+    border-radius: var(--radius);
+    background-color: var(--color-info-light);
+    color: var(--color-info);
+    margin: 0;
+    box-shadow: var(--shadow-sm);
+    animation: fadeIn 0.3s ease-out;
+    border-left: 4px solid var(--color-info);
+    margin-top: 1rem;
+}
+
+.status-message p.status-success {
+    background-color: var(--color-success-light);
+    color: var(--color-success);
+    border-left: 4px solid var(--color-success);
+    margin-top: 1rem;
+}
+
+.status-message p.status-error {
+    background-color: var(--color-danger-light);
+    color: var(--color-danger);
+    border-left: 4px solid var(--color-danger);
+    margin-top: 1rem;
+}
+
+.status-message p.status-warning {
+    background-color: var(--color-warning-light);
+    color: var(--color-warning);
+    border-left: 4px solid var(--color-warning);
+    margin-top: 1rem;
+} 

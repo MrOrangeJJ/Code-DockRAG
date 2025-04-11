@@ -1,0 +1,155 @@
+/* buttons.css - 按钮样式 */
+
+/* 按钮基础样式 */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius);
+    font-weight: var(--font-weight-medium);
+    font-size: 1rem;
+    background-color: var(--color-gray-300);
+    color: var(--color-gray-900);
+    border: none;
+    cursor: pointer;
+    transition: all var(--transition-fast) ease;
+    white-space: nowrap;
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn:after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    border-radius: 100%;
+    transform: scale(1, 1) translate(-50%);
+    transform-origin: 50% 50%;
+}
+
+.btn:hover {
+    background-color: var(--color-gray-400);
+    transform: translateY(-2px);
+}
+
+.btn:active:after {
+    animation: ripple 0.6s ease-out;
+}
+
+/* 按钮变体 */
+.btn-primary {
+    background: var(--color-primary-gradient);
+    color: var(--color-white);
+}
+
+.btn-primary:hover {
+    filter: brightness(1.05);
+    background: var(--color-primary-gradient);
+}
+
+.btn-success {
+    background: var(--color-success-gradient);
+    color: var(--color-white);
+}
+
+.btn-success:hover {
+    filter: brightness(1.05);
+    background: var(--color-success-gradient);
+}
+
+.btn-danger {
+    background: var(--color-danger-gradient);
+    color: var(--color-white);
+}
+
+.btn-danger:hover {
+    filter: brightness(1.05);
+    background: var(--color-danger-gradient);
+}
+
+.btn-warning {
+    background: var(--color-warning-gradient);
+    color: var(--color-white);
+}
+
+.btn-warning:hover {
+    filter: brightness(1.05);
+    background: var(--color-warning-gradient);
+}
+
+.btn-outline {
+    background-color: transparent;
+    border: 1px solid var(--color-gray-500);
+}
+
+.btn-outline:hover {
+    background-color: var(--color-gray-300);
+    border-color: var(--color-gray-700);
+}
+
+.btn-icon {
+    padding: 0.5rem;
+    border-radius: var(--radius-full);
+}
+
+/* 波纹效果 */
+.ripple-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    transform: scale(0);
+    background: rgba(255, 255, 255, 0.7);
+    animation: ripple-animation 0.6s linear;
+    pointer-events: none;
+}
+
+/* 小按钮 */
+.btn-sm {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.85rem;
+}
+
+/* 关闭按钮 */
+.btn-close {
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    cursor: pointer;
+    font-size: 1.25rem;
+    color: var(--color-gray-700);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-full);
+    transition: all var(--transition-fast) ease;
+}
+
+.btn-close:hover {
+    background-color: var(--color-gray-400);
+    color: var(--color-danger);
+    transform: rotate(90deg);
+}
+
+.btn.disabled,
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+} 
