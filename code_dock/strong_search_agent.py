@@ -9,7 +9,20 @@ import json
 import asyncio
 import logging
 from typing import Dict, List, Optional, Any, Set, Callable, Tuple
-from openai import AsyncOpenAI
+from openai import (
+    AsyncOpenAI, 
+    APITimeoutError, 
+    APIConnectionError, 
+    RateLimitError, 
+    InternalServerError
+)
+import httpx # 导入 httpx
+from tenacity import ( # 导入 tenacity 相关模块
+    retry, 
+    stop_after_attempt,
+    retry_if_result,
+)
+
 from pathlib import Path
 import argparse
 import sys
@@ -46,7 +59,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # 从环境变量获取最大轮次
-MAX_TURNS = int(os.getenv("STRONG_SEARCH_MAX_TURNS"))
+MAX_TURNS = int(os.environ.get("STRONG_SEARCH_MAX_TURNS", "25"))  # 设置默认值
 
 class StrongSearchAgent:
     """
@@ -320,31 +333,30 @@ class StrongSearchAgent:
         Returns:
             Dict[str, Any]: 包含搜索结果的字典
         """
-        # 设置OpenAI客户端
-        # if not await self.setup_openai_client():
-        #     return {"answer": "内部错误: 无法设置LLM客户端", 
-        #            "relevant_files": [], 
-        #            "execution_time": 0}
-        
         # 准备工具函数
         tool_functions = self._create_tool_functions()
-        model_base_url = os.getenv("MODEL_BASE_URL")
-        model_api_key = os.getenv("MODEL_API_KEY")
         
-        if not model_api_key:
-            logger.warning("MODEL_API_KEY environment variable not found, using default settings")
+        # 每次运行时获取当前的环境变量，而不是使用os.getenv，确保使用最新值
+        model_base_url = os.environ.get("MODEL_BASE_URL", "")
+        model_api_key = os.environ.get("MODEL_API_KEY", "")
         
-        # 创建客户端
+        
+        # 创建客户端时传入自定义的 http_client
         self.openai_client = AsyncOpenAI(
             base_url=model_base_url,
             api_key=model_api_key,
+            http_client=CustomRetryClient() # 使用自定义客户端
+            # 注意: AsyncOpenAI 自身的 max_retries 在使用自定义 http_client 时可能不再生效或行为改变
         )
-
         
         # 创建代理 
         try:
-            # 模型名称
-            model = os.getenv("MODEL_NAME")
+            # 获取当前环境变量中的模型名称
+            model = os.environ.get("MODEL_NAME", "gpt-3.5-turbo")
+            
+            # 动态获取最大轮次，如果环境变量已更新则使用新值
+            max_turns = int(os.environ.get("STRONG_SEARCH_MAX_TURNS", str(MAX_TURNS)))
+            
             
             agent = Agent(
                 name="Code Search Expert",
@@ -367,7 +379,7 @@ class StrongSearchAgent:
             {"role": "user", "content": f"I need to answer a question about this project: \"{query}\". Please start by analyzing the project structure."}
         ]
         
-        logger.info(f"Running Agent Runner (Max Turns: {MAX_TURNS})...")
+        logger.info(f"Running Agent Runner (Max Turns: {max_turns})...")
         result_data = {}
         start_time = time.time()
         try:
@@ -379,11 +391,11 @@ class StrongSearchAgent:
                 trace_metadata={"codebase": self.codebase_name, "query": query}
             )
             
-            # 使用RunConfig
+            # 使用RunConfig，并且使用动态获取的最大轮次
             result = await Runner.run(
                 agent, 
                 input=messages, 
-                max_turns=MAX_TURNS,
+                max_turns=max_turns,  # 使用当前环境变量中的设置
                 run_config=run_config
             )
             final_answer = getattr(result, 'final_output', "Failed to get final output")
@@ -946,6 +958,59 @@ class GlobalFileTracingProcessor(TracingProcessor):
 # 创建全局处理器实例
 global_ws_processor = GlobalWebSocketTracingProcessor()
 global_file_processor = GlobalFileTracingProcessor()
+
+
+# --- Tenacity 重试配置 ---
+def check_code(value):
+    return value.status_code in [429]
+
+# 定义一个自定义的等待策略
+def custom_wait_strategy(retry_state):
+    """自定义等待策略，对429错误使用固定40秒，其他使用指数退避"""
+
+    # 对其他错误使用指数退避策略
+    exp_delay = min(1 * (2 ** (retry_state.attempt_number+1)), 30)
+    randomized_delay = exp_delay * (0.75 + (random.random() * 0.5))  # 添加25%的随机抖动
+    return randomized_delay
+
+
+# 定义单一重试策略（不再分开处理不同类型的错误）
+unified_retry = retry(
+    retry=retry_if_result(check_code),
+    wait=custom_wait_strategy,  # 使用自定义等待策略
+    stop=stop_after_attempt(5), # 最多重试5次
+    reraise=True,              # 重新抛出原始异常
+    before_sleep=lambda retry_state: logger.warning(
+        f"准备第{retry_state.attempt_number}次重试, "
+        f"将等待{retry_state.next_action.sleep}秒"
+    )
+)
+
+class CustomRetryTransport(httpx.AsyncHTTPTransport):
+    """自定义HTTP传输层，添加重试机制"""
+    
+    @unified_retry  # 使用统一的重试策略
+    async def handle_async_request(self, request: httpx.Request) -> httpx.Response:
+        """处理异步HTTP请求，添加重试功能"""
+        response = await super().handle_async_request(request)
+        return response
+            
+
+# --- 自定义 HTTP 客户端 ---
+
+def CustomRetryClient(**kwargs) -> httpx.AsyncClient:
+    """创建一个配置了自定义重试 Transport 的 httpx 客户端"""
+    # 可以传递其他 httpx.AsyncClient 参数，例如 timeout
+    # 确保传递的 timeout 不是 NotGiven 类型
+    timeout = kwargs.pop('timeout', httpx.Timeout(60.0)) # 默认60秒超时
+    limits = kwargs.pop('limits', httpx.Limits(max_connections=100, max_keepalive_connections=20))
+    
+    return httpx.AsyncClient(
+        transport=CustomRetryTransport(), 
+        timeout=timeout,
+        limits=limits,
+        **kwargs # 传递任何额外的 httpx 参数
+    )
 
 if __name__ == "__main__":
     pass

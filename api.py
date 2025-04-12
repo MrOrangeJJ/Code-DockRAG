@@ -368,6 +368,13 @@ class ReferenceRequest(BaseModel):
     file_path: str  # 符号所在的文件路径
     symbol_name: str  # 要查找引用的符号名称
 
+class EnvSettingsRequest(BaseModel):
+    """环境变量设置请求模型"""
+    model_name: Optional[str] = None
+    model_base_url: Optional[str] = None
+    model_api_key: Optional[str] = None
+    strong_search_max_turns: Optional[int] = None
+
 
 def is_codebase_indexed(codebase_name: str) -> bool:
     """检查代码库是否已索引"""
@@ -1568,6 +1575,59 @@ async def search_text_in_codebase(codebase_name: str, keyword: str):
 
     result = search_text(codebase_name, keyword)
     return result
+
+@app.post("/settings/env")
+async def update_env_settings(request: EnvSettingsRequest):
+    """更新强化搜索相关的环境变量设置"""
+    try:
+        # 创建一个字典来跟踪哪些变量被更新了
+        updated = {}
+        
+        # 只更新请求中提供的非None值
+        if request.model_name is not None:
+            os.environ["MODEL_NAME"] = request.model_name
+            updated["MODEL_NAME"] = request.model_name
+            
+        if request.model_base_url is not None:
+            os.environ["MODEL_BASE_URL"] = request.model_base_url
+            updated["MODEL_BASE_URL"] = request.model_base_url
+            
+        if request.model_api_key is not None:
+            os.environ["MODEL_API_KEY"] = request.model_api_key
+            updated["MODEL_API_KEY"] = "**********"  # 出于安全考虑不返回实际密钥
+            
+        if request.strong_search_max_turns is not None:
+            os.environ["STRONG_SEARCH_MAX_TURNS"] = str(request.strong_search_max_turns)
+            updated["STRONG_SEARCH_MAX_TURNS"] = str(request.strong_search_max_turns)
+            
+
+        return {
+            "status": "success",
+            "message": "环境变量设置已更新",
+            "updated": updated
+        }
+    except Exception as e:
+        logger.error(f"更新环境变量设置时出错: {e}")
+        raise HTTPException(status_code=500, detail=f"更新环境变量设置失败: {str(e)}")
+
+@app.get("/settings/env")
+async def get_env_settings():
+    """获取当前强化搜索相关的环境变量设置"""
+    try:
+        settings = {
+            "MODEL_NAME": os.environ.get("MODEL_NAME", ""),
+            "MODEL_BASE_URL": os.environ.get("MODEL_BASE_URL", ""),
+            "MODEL_API_KEY": "**********" if os.environ.get("MODEL_API_KEY") else "",  # 出于安全考虑不返回实际密钥
+            "STRONG_SEARCH_MAX_TURNS": os.environ.get("STRONG_SEARCH_MAX_TURNS", ""),
+        }
+        
+        return {
+            "status": "success",
+            "settings": settings
+        }
+    except Exception as e:
+        logger.error(f"获取环境变量设置时出错: {e}")
+        raise HTTPException(status_code=500, detail=f"获取环境变量设置失败: {str(e)}")
 
 # --- 运行服务器 (用于直接执行脚本) ---
 if __name__ == "__main__":

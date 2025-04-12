@@ -50,6 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
     StrongSearch.init(config);
     FileExplorer.init(config);
     AstViewer.init(config);
+    Settings.init(config);
 
     // 添加全局按钮点击波纹效果
     document.addEventListener('click', UI.addRippleEffect);
@@ -61,7 +62,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 'file-explorer-modal': FileExplorer.closeModal,
                 'ast-view-modal': AstViewer.closeModal,
                 'search-modal': Search.closeModal,
-                'strong-search-modal': StrongSearch.closeModal
+                'strong-search-modal': StrongSearch.closeModal,
+                'settings-modal': Settings.closeSettingsModal
             };
             
             // 检查所有可能打开的模态框
@@ -82,7 +84,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 'file-explorer-modal': FileExplorer.closeModal,
                 'ast-view-modal': AstViewer.closeModal,
                 'search-modal': Search.closeModal,
-                'strong-search-modal': StrongSearch.closeModal
+                'strong-search-modal': StrongSearch.closeModal,
+                'settings-modal': Settings.closeSettingsModal
             };
             
             const modalId = e.target.id;

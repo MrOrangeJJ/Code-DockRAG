@@ -600,7 +600,6 @@ def generate_formatted_structure(codebase_name: str) -> str:
         methods = file_info.get("methods", [])
         
         # 添加分隔线和文件路径
-        result.append("-"*70)
         result.append(f"{file_path}")
         
         # 添加类和它们的方法
@@ -629,9 +628,6 @@ def generate_formatted_structure(codebase_name: str) -> str:
                 method_name = method.get("name", "未命名方法")
                 result.append(f"\t{method_name}()")
     
-    # 添加最后的分隔线
-    if result:
-        result.append("-"*70)
     
     return "\n".join(result)
 

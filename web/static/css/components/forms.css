@@ -170,4 +170,33 @@ textarea:focus {
     gap: 0.5rem;
     justify-content: flex-end;
     margin-top: 1rem;
+}
+
+/* 设置表单相关样式 */
+.settings-form {
+    padding: 1rem 0;
+}
+
+.settings-group {
+    margin-bottom: 1.5rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    background-color: #f9fafb;
+}
+
+.settings-group h4 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: #4b5563;
+    font-size: 1.1rem;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 0.5rem;
+}
+
+.settings-form .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 1rem;
 } 

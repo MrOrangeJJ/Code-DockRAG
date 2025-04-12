@@ -20,3 +20,4 @@ concurrent-log-handler
 tqdm
 openai-agents
 multilspy
+tenacity
