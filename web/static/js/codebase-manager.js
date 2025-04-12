@@ -17,6 +17,7 @@ const CodebaseManager = (function() {
     let API_BASE_URL;
     let WEB_API_BASE_URL;
     let indexingPolls = {}; // 存储索引状态轮询的定时器ID
+    let descriptionModal, descModalClose, descriptionTitle, descriptionContent; // 描述模态框相关元素
 
     // 初始化函数
     function init(config) {
@@ -33,6 +34,12 @@ const CodebaseManager = (function() {
         uploadStatusDiv = document.getElementById('upload-status');
         fileInput = document.getElementById('codebase-file');
         fileNameDisplay = document.getElementById('file-name-display');
+        
+        // 初始化描述模态框DOM元素引用
+        descriptionModal = document.getElementById('description-modal');
+        descModalClose = document.getElementById('desc-modal-close');
+        descriptionTitle = document.getElementById('description-title');
+        descriptionContent = document.getElementById('description-content');
         
         // 绑定事件
         bindEvents();
@@ -62,6 +69,20 @@ const CodebaseManager = (function() {
         const refreshButton = document.getElementById('refresh-codebases');
         if (refreshButton) {
             refreshButton.addEventListener('click', fetchCodebases);
+        }
+        
+        // 描述模态框关闭按钮
+        if (descModalClose) {
+            descModalClose.addEventListener('click', () => UI.closeModal(descriptionModal));
+        }
+        
+        // 点击描述模态框外部关闭
+        if (descriptionModal) {
+            descriptionModal.addEventListener('click', (e) => {
+                if (e.target === descriptionModal) {
+                    UI.closeModal(descriptionModal);
+                }
+            });
         }
     }
 
@@ -150,6 +171,8 @@ const CodebaseManager = (function() {
             FileExplorer.openModal(codebaseName);
         } else if (button.classList.contains('ast-btn')) {
             AstViewer.openModal(codebaseName);
+        } else if (button.classList.contains('desc-btn')) {
+            await showCodebaseDescription(codebaseName);
         } else if (button.classList.contains('index-btn')) {
             await handleReindexCodebase(codebaseName);
         } else if (button.classList.contains('delete-btn')) {
@@ -157,6 +180,43 @@ const CodebaseManager = (function() {
         }
     }
 
+    // 显示代码库描述
+    async function showCodebaseDescription(codebaseName) {
+        if (!descriptionModal || !descriptionTitle || !descriptionContent) {
+            console.error("描述模态框元素未找到!");
+            UI.showStatus(manageStatusDiv, '无法显示描述：UI元素丢失', 'error');
+            return;
+        }
+        
+        try {
+            UI.showStatus(manageStatusDiv, `正在加载 ${codebaseName} 的描述...`, 'info');
+            descriptionContent.innerText = "加载中..."; // 清空旧内容并显示加载提示
+            UI.openModal(descriptionModal);
+            
+            const response = await fetch(`${WEB_API_BASE_URL}/codebases/${codebaseName}/description`);
+            
+            // 检查是否成功
+            if (!response.ok) {
+                throw new Error(`获取描述失败: ${response.status} ${response.statusText}`);
+            }
+            
+            const description = await response.text();
+            
+            // 更新模态框内容
+            descriptionTitle.textContent = `${codebaseName} 描述`;
+            // 替换可能的转义换行符 \n 为实际换行符 
+
+            const formattedDescription = description.replace(/\\n/g, '\n'); 
+            descriptionContent.innerText = formattedDescription || "无描述信息"; // 使用处理后的文本
+            
+            UI.showStatus(manageStatusDiv, `已加载 ${codebaseName} 的描述`, 'success');
+        } catch (error) {
+            console.error('获取描述失败:', error);
+            UI.showStatus(manageStatusDiv, `加载描述失败: ${error.message}`, 'error');
+            descriptionContent.innerText = `加载描述失败: ${error.message}`; // 在模态框中也显示错误
+        }
+    }
+    
     // 重新索引代码库
     async function handleReindexCodebase(codebaseName) {
         if (confirm(`确定要${isIndexing(codebaseName) ? '重新开始' : '开始'}索引代码库 "${codebaseName}" 吗？`)) {
@@ -238,7 +298,7 @@ const CodebaseManager = (function() {
             } catch (error) {
                 console.error(`轮询 ${codebaseName} 索引状态出错:`, error);
             }
-        }, 3000); // 每3秒检查一次
+        }, 5000); // 每3秒检查一次
     }
     
     // 判断代码库是否正在索引
@@ -485,6 +545,9 @@ const CodebaseManager = (function() {
                         </button>
                         <button class="btn btn-secondary ast-btn" data-name="${Utils.escapeHtml(cb.name)}" title="查看代码结构树">
                             <i class="fas fa-project-diagram"></i> 查看AST
+                        </button>
+                        <button class="btn btn-info desc-btn" data-name="${Utils.escapeHtml(cb.name)}" title="查看代码库描述">
+                            <i class="fas fa-info-circle"></i> 查看描述
                         </button>
                         <button class="btn btn-primary index-btn ${cb.indexing_status === 'indexing' ? 'disabled' : ''}" 
                                 data-name="${Utils.escapeHtml(cb.name)}" 

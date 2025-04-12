@@ -989,7 +989,7 @@ unified_retry = retry(
 class CustomRetryTransport(httpx.AsyncHTTPTransport):
     """自定义HTTP传输层，添加重试机制"""
     
-    @unified_retry  # 使用统一的重试策略
+    @unified_retry
     async def handle_async_request(self, request: httpx.Request) -> httpx.Response:
         """处理异步HTTP请求，添加重试功能"""
         response = await super().handle_async_request(request)

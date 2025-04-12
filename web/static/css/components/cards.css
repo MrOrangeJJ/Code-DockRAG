@@ -142,6 +142,16 @@
     display: none;
 }
 
+/* 描述按钮样式 - 让按钮变小 */
+.codebase-actions .btn {
+    font-size: 0.85rem; /* 调小字体 */
+    padding: 0.4rem 0.8rem; /* 调整内边距使其更紧凑 */
+    min-height: auto; /* 移除或调整最小高度 */
+    line-height: 1.4; /* 调整行高 */
+}
+
+
+
 .status-badge.status-disconnected {
     background-color: var(--color-danger-light);
     color: var(--color-danger);
