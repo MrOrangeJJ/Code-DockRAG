@@ -10,6 +10,8 @@ packs/
 uploads/
 build_and_run_local.sh
 build.sh
-Dockerfile.super-slim
+Dockerfile.arm
+Dockerfile.x86
 pack_docker.sh
 .DS_Store
+test_adk_qwen_events.py
