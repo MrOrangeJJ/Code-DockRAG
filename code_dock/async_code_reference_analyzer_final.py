@@ -422,7 +422,7 @@ class AsyncCodeReferenceAnalyzer:
         total_files = sum([len(x) for x in self.global_symbol_cache.values()])
         record = deepcopy(self.global_symbol_cache)
 
-        bar = tqdm(total=total_files, desc="处理文件")
+        # bar = tqdm(total=total_files, desc="处理文件")
         progress = 0
 
         async def find_refs(file_path, symbol_name):
@@ -431,7 +431,7 @@ class AsyncCodeReferenceAnalyzer:
             progress += 1
             if progress_callback:
                 progress_callback(progress / total_files)
-            bar.update(1)
+            # bar.update(1)
             return temp
     
         tasks = []

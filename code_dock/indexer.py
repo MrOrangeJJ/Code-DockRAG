@@ -186,6 +186,7 @@ async def init_lsp_cache(codebase_name: str) -> bool:
         print("--------------------------------");
         
         def progress_callback(progress):
+            print(f"progress: {progress}")
             update_config_file(codebase_name, {"analyzer_progress": progress}, mark_dirty=False)
         
         refs = await analyzer.generate_all_references(progress_callback=progress_callback)

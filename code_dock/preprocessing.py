@@ -29,8 +29,7 @@ def load_files(codebase_name):
                     language = get_language_from_extension(file_ext)
                     if language:
                         file_list.append((file_path, language))
-                    else:
-                        logger.warning(f"不支持的文件扩展名 {file_ext} in file {file_path}. 跳过。")
+
     return file_list
 
 def parse_code_files(file_list):
